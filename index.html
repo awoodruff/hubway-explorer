@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Hubway Trip Explorer</title>
+		<link href="hubway.css" rel="stylesheet" type="text/css" />
+		<link href="lib/leaflet.css" rel="stylesheet" type="text/css" />
+		<link href="jquery-ui.css" rel="stylesheet" type="text/css" />
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
+		<script type="text/javascript" src="lib/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="http://cdn.leafletjs.com/leaflet-0.4/leaflet.js"></script>
+		<script type="text/javascript" src="lib/arc.js"></script>
+		<script type="text/javascript" src="http://tiles.mapc.org/layers.js"></script>
+		<script type="text/javascript" src="http://maps.stamen.com/js/tile.stamen.js?v1.2.0"></script>
+		<script type="text/javascript" src="trips.js"></script>
+		<script type="text/javascript">
+			var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+			document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+			</script>
+			<script type="text/javascript">
+			try{
+			var pageTracker = _gat._getTracker("UA-20198240-1");
+			pageTracker._trackPageview();
+			} catch(err) {
+		</script>
+	<head>
+	<body>
+		<div id="header">
+			<a href="hubway_snapshots.pdf" target="_blank" title="View more maps and charts of Hubway data"><img src="images/snapshots.png" alt="Hubway snapshots"/></a>
+			<p id="title">Hubway Trip Explorer</p>
+			<p id="subtitle">Explore Hubway trips filtered by time, demographic, and weather factors</p>
+		</div>
+		<div id="left">
+			<div class="section">
+				<div class="section-header open">TIME</div>
+				<div class="section-content">
+					<div class="filter" id="time">
+						<p class="filter-title">Time of day</p>
+						<p class="text-filter selected">Starting between</p>
+						<p class="text-filter">Ending between</p>
+						<div style="margin-left:70px"><div class="plus">+</div><p id="start-hour" class="time-step hour">12</p><div class="minus">-</div></div> :
+						<div><div class="plus">+</div><p id="start-minute" class="time-step minute">00</p><div class="minus">-</div></div>
+						<div><div class="plus">+</div><p id="start-am" class="time-step am">AM</p><div class="minus">-</div></div>
+						<div><p style="display:inline-block;margin: auto 7px;">and</p></div>
+						<div><div class="plus">+</div><p id="end-hour" class="time-step hour">12</p><div class="minus">-</div></div> :
+						<div><div class="plus">+</div><p id="end-minute" class="time-step minute">00</p><div class="minus">-</div></div>
+						<div><div class="plus">+</div><p id="end-am" class="time-step am">AM</p><div class="minus">-</div></div>
+					</div>
+					<div class="filter" id="date">
+						<p class="filter-title">Date of ride</p>
+						<p>Month:</p>
+						<div id="months">
+							<p>M</p>
+							<p>A</p>
+							<p>M</p>
+							<p>J</p>
+							<p>J</p>
+							<p>A</p>
+							<p>S</p>
+							<p>O</p>
+							<p>N</p>
+						</div>
+						<p>Day of week:</p>
+						<div id="days">
+							<p>S</p>
+							<p>M</p>
+							<p>T</p>
+							<p>W</p>
+							<p>T</p>
+							<p>F</p>
+							<p>S</p>
+						</div>
+					</div>
+					<div class="filter" id="daylight">
+						<p class="filter-title">Day or night</p>
+						<p class="text-filter">Daylight (sunrise to sunset)</p>
+						<p class="text-filter">Non-daylight (sunset to sunrise)</p>
+						<p class="text-filter selected">Either day or night</p>
+					</div>
+					<div class="filter" id="duration">
+						<p class="filter-title">Duration of ride</p>
+						<p class="slider-title">All durations</p>
+						<div class="filter-slider" id="duration-slider"></div>
+						<div class="filter-labels">
+							<p class="filter-label-min">0</p>
+							<p class="filter-label-max">6 hrs</p>
+						</div>
+						<input type="checkbox" id="duration-check" checked/><label for="duration-check" class="selected">Include rides longer than 6 hours</label>
+					</div>
+				</div>
+			</div>
+			<div class="section">
+			<div class="section-header open">MEMBERSHIP</div>
+				<div class="section-content">
+					<div class="filter" id="member-type">
+						<p class="filter-title">Member type</p>
+						<p class="text-filter">Registered</p>
+						<p class="text-filter">Casual</p>
+						<p class="text-filter selected">All members</p>
+					</div>
+				</div>
+			</div>
+			<div class="section">
+				<div class="section-header open">DEMOGRAPHICS <span class="note">(registered riders only)</div>
+				<div class="section-content">
+					<div class="filter" id="gender">
+						<p class="filter-title">Sex of rider</p>
+						<p class="text-filter">Female</p>
+						<p class="text-filter">Male</p>
+						<p class="text-filter selected">All riders</p>
+					</div>
+					<div class="filter" id="age">
+						<p class="filter-title">Age of rider</p>
+						<p class="slider-title">All ages</p>
+						<div class="filter-slider" id="age-slider"></div>
+						<div class="filter-labels">
+							<p class="filter-label-min">17</p>
+							<p class="filter-label-max">80</p>
+						</div>
+					</div>
+					<div class="filter" id="zip-code">
+						<p class="filter-title">Home of rider</p>
+						<p class="text-filter">Central city: Hubway service area</p>
+						<p class="text-filter">Inside Route 128</p>
+						<p class="text-filter">South and west (S. Station commuter lines)</p>
+						<p class="text-filter">North (N. Station commuter lines)</p>
+						<p class="text-filter selected">Any location</p>
+					</div>
+				</div>
+			</div>
+			<div class="section">
+				<div class="section-header open">WEATHER</div>
+				<div class="section-content">
+					<div class="filter" id="precip">
+						<p class="filter-title">Precipitation on day of ride</p>
+						<p class="text-filter">No precipitation</p>
+						<p class="text-filter">Some precipitation</p>
+						<p class="text-filter selected">All days</p>
+					</div>
+					<div class="filter" id="temp">
+						<p class="filter-title">Avg. temperature on day of ride</p>
+						<p class="slider-title">All temperatures</p>
+						<div class="filter-slider" id="temp-slider"></div>
+						<div class="filter-labels">
+							<p class="filter-label-min">25</p>
+							<p class="filter-label-max">90</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="right">
+			<div id="map"></div>
+			<div id="footer">
+				<p id="mode-toggle" class="station">Click to view all stations</p>
+				<div id="selected-label"><p id="label"></p><p>Select stations on the map to view their trip volumes</p></div>
+				<div id="station-legend"></div>
+				<div id="overall-legend"></div>
+			</div>
+		</div>
+		<div id="probe"></div>
+	</body>
+</html>
